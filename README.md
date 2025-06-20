@@ -11,3 +11,5 @@ Ejecutar `env\Scripts\activate`
 Instalar las librerías con el siguiente comando `pip install -r requirements.txt`
 ## Ejecutar proyecto
 Para ejecutar el proyecto `py main.py`
+## backtesting 0.6.4
+Para el test de informasión
