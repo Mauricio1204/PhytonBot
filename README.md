@@ -12,4 +12,4 @@ Instalar las librerías con el siguiente comando `pip install -r requirements.tx
 ## Ejecutar proyecto
 Para ejecutar el proyecto `py main.py`
 ## backtesting 0.6.4
-Para el test de informasión
+Para el test de información
