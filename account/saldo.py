@@ -20,10 +20,10 @@ def mostrar_balance_futuros_usdt():
         for asset in balance_futuros:
             if asset['asset'] == 'USDT':
                 console.print(f"USDT Futuros disponible: {asset['availableBalance']} USD", style="bold green")
-                if float(asset['availableBalance']) > 0:
+                if float(asset['availableBalance']) >= 10:
                     console.print("Tienes USDT disponibles para operar en Futuros.", style="bold white")
                 else:
-                    console.print("No tienes USDT disponible en Futuros.", style="bold red")
+                    console.print("No tienes USDT suficientes para operar en Futuros.", style="bold red")
                 break
         else:
             print("No se encontró USDT en tu cuenta de Futuros.")
