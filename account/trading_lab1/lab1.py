@@ -1,15 +1,16 @@
 import yfinance as yf
-import ta
+import ta.trend
 import pandas as pd
 from backtesting import Strategy
 from backtesting.lib import crossover
+from backtesting import Backtest
 
 class SMAcross(Strategy):
     # Señal de compra cuando SMA rapida n1 cruza por encima de SMA lenta n2, caso contrario para entradas en corto
     # Variables a testear  
-    n1 = 50 
-    n2 = 100
-    risk_per_trade = 0.02
+    n1 = 100 
+    n2 = 50
+    risk_per_trade = 0.05
     stop_loss_pct = 0.05
     take_profit_pct = 0.10
 
@@ -19,10 +20,10 @@ class SMAcross(Strategy):
         
         # Indicadores de medias móviles
         close = self.data.Close
-        self.sma1 = self.I(ta.SMA, close, self.n1)
-        self.sma2 = self.I(ta.SMA, close, self.n2)
+        self.sma1 = self.I(ta.trend.sma_indicator, close, self.n1)
+        self.sma2 = self.I(ta.trend.sma_indicator, close, self.n2)
 
-        self.current_SL = None
+        self.current_sl = None
         self.current_tp = None
 
     def next(self):
@@ -37,7 +38,7 @@ class SMAcross(Strategy):
                 self.buy(sl=self.current_sl, tp=self.current_tp)
                 self.set_log(f"Comprando a {price:.2f}, SL: {self.current_sl:.2f}, TP: {self.current_tp:.2f}")
 
-            elif crossover(self.sma1, self.sma2):
+            elif crossover(self.sma2, self.sma1):
             #Cruce bajista
                 self.current_sl = price * (1 + self.stop_loss_pct) 
                 self.current_tp = price * (1 - self.take_profit_pct) 
@@ -56,18 +57,26 @@ class SMAcross(Strategy):
                     self.position.close()
                     self.set_log(f"Cerrando posicion corta a {price:0.2f} por cruce alcista")
 
-if __name__ == '__Cruce optimizado__':
+if __name__ == '__main__':
     symbol = "BTC-USD"
-    start_date = ""
-    end_date = ""
-    data = yf.download(symbol, start=start_date, end=end_date)
+    period = "1mo"
+    auto_adjust = False
+    data = yf.download(symbol, period=period, auto_adjust=auto_adjust)
+    
+    data.columns = [col[1][0] if isinstance(col, tuple) else col for col in data.columns]
 
-    data.columns = [col.capitalize() for col in data.columns]
-
-    from backtesting import Backtest
+    print( data.columns )
+    
+    # Solo deja las columnas necesarias
+    required_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
+    missing = [col for col in required_cols if col not in data.columns]
+    if missing:
+        raise ValueError(f"Faltan columnas necesarias: {missing}")
+    
+    data = data[required_cols]
 
     bt = Backtest(data, SMAcross,
-                  cash=100000,        
+                  cash=10000,        
                   commission=0.002,    
                   exclusive_orders=True) # Solo una orden por barra
 
